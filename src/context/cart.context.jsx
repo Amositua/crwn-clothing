@@ -55,7 +55,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     const newCartCount = cartItems.reduce(
-      (total, cartItem) => total + cartItem.quantity,
+      (accumulator, cartItem) => accumulator + cartItem.quantity,
       0
     );
     setCartCount(newCartCount);
@@ -63,7 +63,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     const newCartTotal = cartItems.reduce(
-      (total, cartItem) => total + cartItem.quantity * cartItem.price,
+      (accumulator, cartItem) => accumulator + cartItem.quantity * cartItem.price,
       0
     );
     setCartTotal(newCartTotal);

@@ -1,17 +1,21 @@
-import { useState, useContext } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from 'react-router-dom';
+
 
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
 
-import { UserContext } from "../../context/user.context";
+// import { UserContext } from "../../context/user.context";
 
-import {
-  signInAuthWithEmailAndPassword,
-  createUserDocumentFromAuth,
-  SignInWithGooglePopup,
-} from "../../utils/firebase/firebase.utils";
+// import {
+//   signInAuthWithEmailAndPassword,
+// } from "../../utils/firebase/firebase.utils";
+
+import { googleSignInStart, emailSignInStart } from "../../store/user/user.action";
 
 import "./sign-in-form.styles.scss";
+import { selectCurrentUser } from "../../store/user/user.selector";
 
 const defaultFormFields = {
   email: "",
@@ -19,19 +23,26 @@ const defaultFormFields = {
 };
 
 const SignInForm = () => {
+  const dispatch = useDispatch();
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
+  const currentUser = useSelector(selectCurrentUser)
+  const navigate = useNavigate();
+  // const { setCurrentUser } = useContext(UserContext);
 
-  const { setCurrentUser } = useContext(UserContext);
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/');
+    }
+  }, [currentUser, navigate]);
 
   const SignInWithGoogle = async () => {
-    try {
-      const { user } = await SignInWithGooglePopup();
-      // setCurrentUser(user);
-      // await createUserDocumentFromAuth(user);
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch(googleSignInStart())
+    // if(currentUser) {
+    //   navigate('/');
+    // } else {
+    //   alert('Invalid credentials');
+    // }
   };
 
   const resetFormFields = () => {
@@ -42,7 +53,8 @@ const SignInForm = () => {
     event.preventDefault();
 
     try {
-      const { user } = await signInAuthWithEmailAndPassword(email, password);
+      dispatch(emailSignInStart(email, password))
+      // const { user } = await signInAuthWithEmailAndPassword(email, password);
       // setCurrentUser(user);
       resetFormFields();
     } catch (error) {
@@ -87,7 +99,7 @@ const SignInForm = () => {
         />
         <div className="buttons-container">
           <Button type="submit">Sign In</Button>
-          <Button type="button" buttonType="google" onClick={SignInWithGoogle}>
+          <Button type="button" buttonType="google-sign-in" onClick={SignInWithGoogle}>
             Google sign in
           </Button>
         </div>
